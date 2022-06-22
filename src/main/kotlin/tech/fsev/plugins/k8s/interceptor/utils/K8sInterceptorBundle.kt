@@ -1,13 +1,13 @@
-package org.jetbrains.plugins.template
+package tech.fsev.plugins.k8s.interceptor.utils
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.MyBundle"
+private const val BUNDLE = "messages.K8sInterceptorBundle"
 
-object MyBundle : DynamicBundle(BUNDLE) {
+object K8sInterceptorBundle : DynamicBundle(BUNDLE) {
 
     @Suppress("SpreadOperator")
     @JvmStatic

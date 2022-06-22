@@ -1,18 +1,86 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>org.jetbrains.plugins.template</id>
-    <name>Template</name>
-    <vendor>JetBrains</vendor>
+    <id>tech.fsev.plugins.k8s.interceptor</id>
+    <name>Kubernetes Service Interceptor</name>
+    <vendor>Sergei Fedotov</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="org.jetbrains.plugins.template.services.MyApplicationService"/>
-        <projectService serviceImplementation="org.jetbrains.plugins.template.services.MyProjectService"/>
+        <postStartupActivity implementation="tech.fsev.plugins.k8s.interceptor.InterceptorStartupActivity"/>
+        <notificationGroup id="Kubernetes Interceptor Plugin"
+                           displayType="BALLOON"
+        />
     </extensions>
 
     <applicationListeners>
-        <listener class="org.jetbrains.plugins.template.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+        <listener
+                class="tech.fsev.plugins.k8s.interceptor.listeners.K8sInterceptorAppLifecycleListener"
+                topic="com.intellij.ide.AppLifecycleListener"
+        />
     </applicationListeners>
+
+    <actions>
+        <group
+                id="K8sInterceptorMenu"
+                text="Kubernetes Interceptor"
+                description="Intercepts all traffic from Kubernetes cluster to your local machine via Telepresence"
+                popup="true"
+                icon="AllIcons.Actions.SwapPanels"
+        >
+
+            <add-to-group group-id="NavBarToolBar" anchor="after" relative-to-action="NavBarActions"/>
+            <action
+                    id="K8sInterceptor.ConnectToCluster"
+                    text="Connect to Cluster"
+                    description="Connect to Kubernetes cluster (admin privileges may be needed)"
+                    class="tech.fsev.plugins.k8s.interceptor.actions.connection.ConnectToClusterAction"
+                    icon="AllIcons.Debugger.ThreadStates.Socket"
+            />
+            <action
+                    id="K8sInterceptor.DisconnectFromCluster"
+                    text="Disconnect from Cluster"
+                    description="Disconnect from Kubernetes cluster"
+                    class="tech.fsev.plugins.k8s.interceptor.actions.connection.DisconnectFromClusterAction"
+                    icon="AllIcons.Debugger.ThreadStates.Socket"
+            />
+            <separator/>
+            <action
+                    id="K8sInterceptor.SwapService"
+                    text="Select Service to Intercept..."
+                    description="Select service to intercept"
+                    class="tech.fsev.plugins.k8s.interceptor.actions.interception.SwapInterceptAction"
+                    icon="AllIcons.Debugger.ThreadStates.Socket"
+            />
+            <action
+                    id="K8sInterceptor.UpdateInterceptionStatus"
+                    text="Update Interception Status"
+                    description="Update interception status"
+                    class="tech.fsev.plugins.k8s.interceptor.actions.interception.UpdateInterceptionStatusAction"
+                    icon="AllIcons.Debugger.ThreadStates.Socket"
+            />
+            <separator/>
+            <action
+                    id="K8sInterceptor.SettingsAction"
+                    text="Settings"
+                    description="Open plugin settings"
+                    class="tech.fsev.plugins.k8s.interceptor.actions.SettingsAction"
+                    icon="AllIcons.General.Settings"
+            />
+
+        </group>
+
+        <group
+                id="SwappedServices"
+                class="tech.fsev.plugins.k8s.interceptor.actions.interception.SwappedInterceptsActionGroup"
+                text="Intercepted Services"
+                description="See intercepted services"
+                popup="true"
+                icon="AllIcons.Actions.Copy"
+        >
+
+            <add-to-group group-id="K8sInterceptorMenu" anchor="after"
+                          relative-to-action="K8sInterceptor.SwapService"/>
+        </group>
+    </actions>
 </idea-plugin>
